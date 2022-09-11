@@ -1,0 +1,56 @@
+{
+  "path": {
+    "complexobject": {
+      "str": "Another pathed string!",
+      "complexList": [
+        {
+          "basicObject": {
+            "str": "A pathed first object",
+            "num": 7
+          },
+          "num": 74.3
+        },
+        {
+          "basicObject": {
+            "str": "A pathed second object",
+            "num": -201
+          },
+          "num": 1.0
+        },
+        {
+          "basicObject": {
+            "str": "A pathed third Object",
+            "num": -34
+          },
+          "num": -928.45
+        }
+      ]
+    }
+  },
+  "complexobject": {
+    "str": "HellO!",
+    "complexList": [
+      {
+        "basicObject": {
+          "str": "First object",
+          "num": 1
+        },
+        "num": 2.1
+      },
+      {
+        "basicObject": {
+          "str": "Second object",
+          "num": 19
+        },
+        "num": 0.3
+      },
+      {
+        "basicObject": {
+          "str": "Third Object",
+          "num": -76
+        },
+        "num": -6.7
+      }
+    ]
+  }
+}

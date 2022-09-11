@@ -8,7 +8,13 @@ include 'resourcepack-api'
 include 'packeteer'
 include 'enchantment-api'
 include 'command-api'
-include 'storage-api'
 include 'annotations'
 
+include 'storage-api'
+include 'storage-api:test-core'
+include 'storage-api:spigot'
+include 'storage-api:standalone'
+
 include 'experimental'
+
+

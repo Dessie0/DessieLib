@@ -1,0 +1,23 @@
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api project(":storage-api")
+    implementation 'com.google.code.gson:gson:2.9.1'
+
+    testImplementation project(":storage-api:test-core")
+    testImplementation('org.junit.jupiter:junit-jupiter:5.9.0')
+}
+
+test {
+    useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        gpr(MavenPublication) {
+            groupId = "me.dessie.dessielib.storage-api"
+        }
+    }
+}

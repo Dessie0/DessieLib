@@ -1,0 +1,32 @@
+{
+  "nestedcomplexobject": {
+    "bool": true,
+    "complexObject": {
+      "basicObject": {
+        "str": "I am basic",
+        "num": 9
+      },
+      "num": 9.5
+    },
+    "basicObject": {
+      "str": "I am more basic.",
+      "num": 7
+    }
+  },
+  "path": {
+    "nestedcomplexobject": {
+      "bool": false,
+      "complexObject": {
+        "basicObject": {
+          "str": "Golly gosh, I am inside a complex object that is nested inside another object and that entire thing is a path!",
+          "num": -8
+        },
+        "num": -17.3
+      },
+      "basicObject": {
+        "str": "I have less to say.",
+        "num": 3
+      }
+    }
+  }
+}

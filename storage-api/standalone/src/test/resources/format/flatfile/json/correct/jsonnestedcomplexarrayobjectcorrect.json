@@ -1,0 +1,384 @@
+{
+  "nestedcomplexobjects": {
+    "str": "247",
+    "nestedComplexObjects": [
+      {
+        "bool": true,
+        "complexObject": {
+          "basicObject": {
+            "str": "I am basic",
+            "num": 1
+          },
+          "num": -98.24
+        },
+        "basicObject": {
+          "str": "I am more basic.",
+          "num": 15
+        }
+      },
+      {
+        "bool": false,
+        "complexObject": {
+          "basicObject": {
+            "str": "I am basicer",
+            "num": -8
+          },
+          "num": 23.76
+        },
+        "basicObject": {
+          "str": "I am more basicer.",
+          "num": 19
+        }
+      },
+      {
+        "bool": true,
+        "complexObject": {
+          "basicObject": {
+            "str": "I am basicest",
+            "num": 5532
+          },
+          "num": 6937.23
+        },
+        "basicObject": {
+          "str": "I am more basicest.",
+          "num": 534
+        }
+      }
+    ],
+    "complexArrayObjects": [
+      {
+        "str": "Hola!",
+        "complexList": [
+          {
+            "basicObject": {
+              "str": "First basic",
+              "num": 90
+            },
+            "num": 98.3
+          },
+          {
+            "basicObject": {
+              "str": "Second basic",
+              "num": 45
+            },
+            "num": -9.4
+          },
+          {
+            "basicObject": {
+              "str": "Third basic",
+              "num": 90
+            },
+            "num": 7.5
+          },
+          {
+            "basicObject": {
+              "str": "Fourth basic",
+              "num": 45
+            },
+            "num": -293.0
+          },
+          {
+            "basicObject": {
+              "str": "Fifth basic",
+              "num": 90
+            },
+            "num": 0.75
+          },
+          {
+            "basicObject": {
+              "str": "Sixth basic",
+              "num": 78
+            },
+            "num": 9.2
+          }
+        ]
+      },
+      {
+        "str": "Hello!",
+        "complexList": [
+          {
+            "basicObject": {
+              "str": "Seventh basic",
+              "num": 6
+            },
+            "num": 32.0
+          },
+          {
+            "basicObject": {
+              "str": "Eighth basic",
+              "num": 98
+            },
+            "num": -9.7
+          },
+          {
+            "basicObject": {
+              "str": "Ninth basic",
+              "num": 14
+            },
+            "num": -9.341
+          },
+          {
+            "basicObject": {
+              "str": "Tenth basic",
+              "num": 34
+            },
+            "num": -902.0
+          },
+          {
+            "basicObject": {
+              "str": "Eleventh basic",
+              "num": 84
+            },
+            "num": 0.8
+          },
+          {
+            "basicObject": {
+              "str": "Twelfth basic",
+              "num": 1009
+            },
+            "num": 8.4
+          }
+        ]
+      },
+      {
+        "str": "Bonjour!",
+        "complexList": [
+          {
+            "basicObject": {
+              "str": "Thirteenth basic",
+              "num": 3
+            },
+            "num": 108.5
+          },
+          {
+            "basicObject": {
+              "str": "Fourteenth basic",
+              "num": 1234
+            },
+            "num": -3.4
+          },
+          {
+            "basicObject": {
+              "str": "Fifteenth basic",
+              "num": -9
+            },
+            "num": -7.5
+          },
+          {
+            "basicObject": {
+              "str": "Sixteenth basic",
+              "num": 845
+            },
+            "num": -87.0
+          },
+          {
+            "basicObject": {
+              "str": "Seventeenth basic",
+              "num": 0
+            },
+            "num": 89.2
+          },
+          {
+            "basicObject": {
+              "str": "Eighteenth basic",
+              "num": 11
+            },
+            "num": 9.3
+          }
+        ]
+      }
+    ]
+  },
+  "path": {
+    "nestedcomplexobjects": {
+      "str": "247",
+      "nestedComplexObjects": [
+        {
+          "bool": true,
+          "complexObject": {
+            "basicObject": {
+              "str": "I am basic",
+              "num": 1
+            },
+            "num": -98.24
+          },
+          "basicObject": {
+            "str": "I am more basic.",
+            "num": 15
+          }
+        },
+        {
+          "bool": false,
+          "complexObject": {
+            "basicObject": {
+              "str": "I am basicer",
+              "num": -8
+            },
+            "num": 23.76
+          },
+          "basicObject": {
+            "str": "I am more basicer.",
+            "num": 19
+          }
+        },
+        {
+          "bool": true,
+          "complexObject": {
+            "basicObject": {
+              "str": "I am basicest",
+              "num": 5532
+            },
+            "num": 6937.23
+          },
+          "basicObject": {
+            "str": "I am more basicest.",
+            "num": 534
+          }
+        }
+      ],
+      "complexArrayObjects": [
+        {
+          "str": "Hola!",
+          "complexList": [
+            {
+              "basicObject": {
+                "str": "First basic",
+                "num": 90
+              },
+              "num": 98.3
+            },
+            {
+              "basicObject": {
+                "str": "Second basic",
+                "num": 45
+              },
+              "num": -9.4
+            },
+            {
+              "basicObject": {
+                "str": "Third basic",
+                "num": 90
+              },
+              "num": 7.5
+            },
+            {
+              "basicObject": {
+                "str": "Fourth basic",
+                "num": 45
+              },
+              "num": -293.0
+            },
+            {
+              "basicObject": {
+                "str": "Fifth basic",
+                "num": 90
+              },
+              "num": 0.75
+            },
+            {
+              "basicObject": {
+                "str": "Sixth basic",
+                "num": 78
+              },
+              "num": 9.2
+            }
+          ]
+        },
+        {
+          "str": "Hello!",
+          "complexList": [
+            {
+              "basicObject": {
+                "str": "Seventh basic",
+                "num": 6
+              },
+              "num": 32.0
+            },
+            {
+              "basicObject": {
+                "str": "Eighth basic",
+                "num": 98
+              },
+              "num": -9.7
+            },
+            {
+              "basicObject": {
+                "str": "Ninth basic",
+                "num": 14
+              },
+              "num": -9.341
+            },
+            {
+              "basicObject": {
+                "str": "Tenth basic",
+                "num": 34
+              },
+              "num": -902.0
+            },
+            {
+              "basicObject": {
+                "str": "Eleventh basic",
+                "num": 84
+              },
+              "num": 0.8
+            },
+            {
+              "basicObject": {
+                "str": "Twelfth basic",
+                "num": 1009
+              },
+              "num": 8.4
+            }
+          ]
+        },
+        {
+          "str": "Bonjour!",
+          "complexList": [
+            {
+              "basicObject": {
+                "str": "Thirteenth basic",
+                "num": 3
+              },
+              "num": 108.5
+            },
+            {
+              "basicObject": {
+                "str": "Fourteenth basic",
+                "num": 1234
+              },
+              "num": -3.4
+            },
+            {
+              "basicObject": {
+                "str": "Fifteenth basic",
+                "num": -9
+              },
+              "num": -7.5
+            },
+            {
+              "basicObject": {
+                "str": "Sixteenth basic",
+                "num": 845
+              },
+              "num": -87.0
+            },
+            {
+              "basicObject": {
+                "str": "Seventeenth basic",
+                "num": 0
+              },
+              "num": 89.2
+            },
+            {
+              "basicObject": {
+                "str": "Eighteenth basic",
+                "num": 11
+              },
+              "num": 9.3
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

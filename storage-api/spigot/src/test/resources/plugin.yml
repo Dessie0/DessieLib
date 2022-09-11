@@ -1,0 +1,4 @@
+main: me.dessie.dessielib.storageapi.TestPlugin
+name: TestPlugin
+author: Dessie
+version: 1.0

@@ -1,0 +1,15 @@
+dependencies {
+    implementation project(":annotations")
+    implementation project(":storage-api")
+
+    implementation('org.junit.jupiter:junit-jupiter:5.9.0')
+    implementation('com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.4')
+}
+
+publishing {
+    publications {
+        gpr(MavenPublication) {
+            groupId = "me.dessie.dessielib.storage-api"
+        }
+    }
+}

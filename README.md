@@ -23,7 +23,7 @@ maven {
 }
 
 dependencies {
-  compileOnly 'me.dessie.dessielib:dessielib:1.3.1'
+  compileOnly 'me.dessie.dessielib:dessielib:1.3.3'
 }
 ```
 
@@ -33,7 +33,7 @@ dependencies {
   <dependency>
     <groupId>me.dessie.dessielib</groupId>
     <artifactId>dessielib</artifactId>
-    <version>1.3.1</version>
+    <version>1.3.3</version>
   </dependency>
 </dependencies>
 ```
@@ -66,7 +66,7 @@ Right now, StorageAPI is the only library that has existing annotations.
 
 If you wish to enable these annotations, make sure to add the following into your build.gradle `dependencies` block.
 ```groovy
-annotationProcessor 'me.dessie.dessielib:annotations:1.3.1'
+annotationProcessor 'me.dessie.dessielib:annotations:1.3.3'
 ```
 
 #### API Examples
