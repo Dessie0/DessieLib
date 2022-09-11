@@ -1,0 +1,17 @@
+basicobjects:
+  basicList:
+    - str: Hello
+      num: 2
+    - str: Hello again
+      num: 8
+    - str: Hey!
+      num: 10
+path:
+  basicobjects:
+    basicList:
+      - str: A nested String
+        num: -9274
+      - str: A second nested String
+        num: 67
+      - str: yAY!
+        num: 0

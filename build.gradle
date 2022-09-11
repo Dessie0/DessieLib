@@ -11,25 +11,31 @@ subprojects {
 }
 
 allprojects {
-    group 'me.dessie'
-    version '1.3.2'
+    group 'me.dessie.dessielib'
+    version '1.3.3'
 }
 
 //Define the Minecraft and SpecialSource Versions.
-String minecraftVersion = "1.19-R0.1-SNAPSHOT"
+String minecraftVersion = "1.19.2-R0.1-SNAPSHOT"
 String specialSourceVersion = "1.11.0"
 
 //Find all the projects, used for publishing.
+//The Experimental module is exclusively for testing purposes, and isn't published.
+//Additionally, the sub-modules of StorageAPI are published as classifiers, and not projects. Therefore they are also excluded.
 Set<Project> publicAll = allprojects.findAll(it -> it.name != 'experimental')
 
 //Find all the sub-projects to add as a dependency for the main project.
-Set<Project> subAll = subprojects.findAll(it -> it.name != 'experimental')
+//The Experimental module is exclusively for testing purposes, and isn't included in the main build.
+//Also, we're not going to add some of the StorageAPI modules.
+Set<Project> subAll = subprojects.findAll(it -> it.name != 'experimental' && it.name != 'test-core' && it.name != 'standalone')
 
 //Find the projects to add the Core project dependency to.
-Set<Project> addCoreDepend = allprojects.findAll(it -> it.name != 'core' && it.name != 'annotations')
+//Core and Annotations do not depend on the Core module.
+Set<Project> addCoreDepend = allprojects.findAll(it -> it.name != 'core' && it.name != 'annotations' && it.name != 'storage-api' && it.name != 'standalone' && it.name != 'test-core')
 
 //Find all the projects to add Spigot and SpecialSource as a dependency
-Set<Project> addSpigotDepend = allprojects.findAll(it -> it.name != 'annotations')
+//Currently, all modules depend on Spigot except for Annotations and StorageAPI.
+Set<Project> addSpigotDepend = allprojects.findAll(it -> it.name != 'annotations' && it.name != 'storage-api')
 
 //Make sure the plugin.yml version is similar to the project version.
 processResources.filesMatching('plugin.yml') {
@@ -56,10 +62,10 @@ project.gradle.projectsEvaluated {
         }
 
         //Only used when publishing, not needed to generate when normal builds are being done.
-//        java {
-//            withJavadocJar()
-//            withSourcesJar()
-//        }
+        java {
+            withJavadocJar()
+            withSourcesJar()
+        }
     }
 }
 
@@ -108,7 +114,7 @@ configure(addSpigotDepend) {
         compileOnly "org.spigotmc:spigot-api:${minecraftVersion}"
 
         //SpecialSource dependency
-        compileOnly"net.md-5:SpecialSource:${specialSourceVersion}:shaded"
+        compileOnly "net.md-5:SpecialSource:${specialSourceVersion}:shaded"
     }
 }
 

@@ -1,0 +1,11 @@
+complexobject:
+  basicObject:
+    str: I am a basic object
+    num: 4
+  num: 6.7
+path:
+  complexobject:
+    basicObject:
+      str: Another basic object
+      num: 8
+    num: 3.984

@@ -1,0 +1,12 @@
+{
+  "path": {
+    "string": "how are you",
+    "boolean": false,
+    "integer": -8,
+    "double": -10.2
+  },
+  "string": "Hello",
+  "boolean": true,
+  "double": 3.2,
+  "integer": 5
+}

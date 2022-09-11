@@ -1,0 +1,30 @@
+path:
+  booleans:
+    - false
+    - true
+  strings:
+    - well
+  doubles:
+    - 0.0
+    - 4.3
+  integers:
+    - 6
+    - 9
+    - -10
+strings:
+  - Hello
+  - how
+  - are
+  - you
+doubles:
+  - 753.3
+  - 90.3
+  - -87.1
+booleans:
+  - true
+  - false
+  - false
+integers:
+  - 4
+  - 2
+  - 7

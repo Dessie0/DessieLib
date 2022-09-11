@@ -1,5 +1,6 @@
 package me.dessie.dessielib.registration;
 
+import me.dessie.dessielib.storageapi.api.IStorageAPI;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -50,7 +51,7 @@ public enum RegistrationType {
     COMMAND_API,
 
     /**
-     * Registers {@link me.dessie.dessielib.storageapi.StorageAPI}
+     * Registers {@link IStorageAPI}
      */
     STORAGE_API
 

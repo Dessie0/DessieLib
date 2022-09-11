@@ -1,0 +1,12 @@
+{
+  "basicobject": {
+    "str": "Hello",
+    "num": 5
+  },
+  "path": {
+    "basicobject": {
+      "str": "another string!",
+      "num": 19
+    }
+  }
+}

@@ -1,0 +1,9 @@
+boolean: true
+string: Hello
+path:
+  integer: -8
+  string: how are you
+  boolean: false
+  double: -10.2
+double: 3.2
+integer: 5
