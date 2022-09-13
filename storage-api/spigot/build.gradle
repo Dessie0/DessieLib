@@ -4,12 +4,14 @@ repositories {
 }
 
 dependencies {
-    api project(":storage-api:standalone")
+    api(project(":storage-api:standalone")) {
+        exclude group: 'com.google.code.gson', module: 'gson'
+    }
 
     testImplementation project(":storage-api:test-core")
     testImplementation('org.junit.jupiter:junit-jupiter:5.9.0')
     testImplementation('org.spigotmc:spigot:1.19.2-R0.1-SNAPSHOT:remapped-mojang')
-    testImplementation('com.github.seeseemelk:MockBukkit-v1.19:2.117.2')
+    testImplementation('com.github.seeseemelk:MockBukkit-v1.19:2.119.3')
 }
 
 test {
