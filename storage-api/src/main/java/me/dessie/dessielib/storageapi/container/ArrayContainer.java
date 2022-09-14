@@ -220,7 +220,7 @@ public abstract class ArrayContainer<H> extends StorageContainer {
         Objects.requireNonNull(path, "Path cannot be null!");
 
         if(!isListSupported(type)) {
-            throw new IllegalArgumentException(type.getName() + " is not a supported storage class for a list within this container!");
+            throw new IllegalArgumentException(path + " was attempted to be stored as " + type.getName() + " which is not a supported storage class for a list in " + this.getClass().getSimpleName());
         }
 
         if(this.isCached(path)) {
