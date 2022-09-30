@@ -1,16 +1,18 @@
 package me.dessie.dessielib.inventoryapi;
 
+import me.dessie.dessielib.inventoryapi.inventory.CustomInventory;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Map;
 
 /**
  * Main class for registering InventoryAPI.
@@ -38,69 +40,66 @@ public class InventoryAPI implements Listener {
     @EventHandler
     private void onInventoryDrag(InventoryDragEvent event) {
         Player player = (Player) event.getWhoClicked();
-        Inventory currentInv = event.getInventory();
+        CustomInventory<?> inventory = CustomInventory.getBuilder(player);
 
-        if(InventoryBuilder.getBuilder(player) != null && InventoryBuilder.getBuilder(player).getInventory() == currentInv) {
-            InventoryBuilder invBuilder = InventoryBuilder.getBuilder(player);
-            Bukkit.getScheduler().runTaskLater(getPlugin(), invBuilder::updateBuilder, 1);
+        if(inventory != null) {
+            for(Map.Entry<Integer, ItemStack> entry : event.getNewItems().entrySet()) {
+                if(inventory.handlesInventory(event.getView().getInventory(entry.getKey()))) {
+                    inventory.updateBuilder(entry.getKey(), entry.getValue());
+                }
+            }
         }
     }
 
     @EventHandler
     private void onInventoryClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
-        if(InventoryBuilder.getBuilder(player) == null) return;
+        CustomInventory<?> inventory = CustomInventory.getBuilder(player);
 
-        //Cancel if they have a Builder open but they didn't click in it
-        if(InventoryBuilder.getBuilder(player).getInventory() != event.getClickedInventory()) {
+        //The inventory they clicked isn't a CustomInventory, so don't attempt to handle it.
+        if(inventory == null) return;
+
+        //Return if they didn't click anything.
+        if((event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR) && (event.getCursor() == null || event.getCursor().getType() == Material.AIR)) return;
+
+        //Cancel if they have a Builder open, but the Inventory they clicked isn't handled by the builder.
+        //I.e, they clicked their inventory.
+        if(!inventory.isAllowPlayerInventory() && !inventory.handlesInventory(event.getClickedInventory())) {
             event.setCancelled(true);
             return;
         }
 
-        if(event.getCurrentItem() == null) return;
-        if(event.getCursor() != null && event.getCursor().getType() != Material.AIR && event.getCurrentItem().getType() == Material.AIR) return;
+        ItemBuilder clicked = inventory.getItem(event.getSlot());
 
-        InventoryBuilder invBuilder = InventoryBuilder.getBuilder(player);
-        Bukkit.getScheduler().runTaskLater(getPlugin(), invBuilder::updateBuilder, 1);
-
-        ItemBuilder clicked = invBuilder.getItem(event.getSlot());
-        for (ItemBuilder item : invBuilder.getItems().values()) {
-            if (item.isSimilar(clicked) && item.getSlot() == clicked.getSlot()) {
-                switch (event.getClick()) {
-                    case LEFT -> item.clickType = ClickType.LEFT;
-                    case RIGHT -> item.clickType = ClickType.RIGHT;
-                    case MIDDLE -> item.clickType = ClickType.MIDDLE;
-                    case SHIFT_LEFT -> item.clickType = ClickType.SHIFT_LEFT;
-                    case SHIFT_RIGHT -> item.clickType = ClickType.SHIFT_RIGHT;
-                }
-
-                if (event.getCursor() != null) {
-                    item.heldItem = event.getCursor();
-                }
-
-                if (item.isCancel()) {
-                    event.setCancelled(true);
-                }
-                item.executeClick(player, item);
-                item.swap();
-                return;
+        //The item could be null, and if it is, just update the inventory to reflect any changes.
+        if(clicked == null) {
+            //Update the inventory
+            if(inventory.handlesInventory(event.getClickedInventory())) {
+                inventory.updateBuilder(event.getSlot(), event.getCursor());
             }
+            return;
+        }
+
+        clicked.executeClick(new ClickResult(player, clicked, event.getClick(), event.getCursor(), inventory));
+        clicked.swap();
+
+        if (clicked.isCancel()) {
+            event.setCancelled(true);
+        } else if (inventory.handlesInventory(event.getClickedInventory())) {
+            inventory.updateBuilder(event.getSlot(), event.getCursor());
         }
     }
 
     @EventHandler
     private void onInventoryClose(InventoryCloseEvent event) {
-        Inventory currentInv = event.getInventory();
         Player player = (Player) event.getPlayer();
+        CustomInventory<?> inventory = CustomInventory.getBuilder(player);
 
-        if (InventoryBuilder.getBuilder(player) != null && InventoryBuilder.getBuilder(player).getInventory() == currentInv) {
-            InventoryBuilder invBuilder = InventoryBuilder.getBuilder(player);
-
-            if (invBuilder.isPreventClose()) {
-                Bukkit.getScheduler().runTaskLater(getPlugin(), () -> event.getPlayer().openInventory(invBuilder.getInventory()), 1);
+        if (inventory != null && inventory.handlesInventory(event.getInventory())) {
+            if (inventory.isPreventClose()) {
+                Bukkit.getScheduler().runTaskLater(getPlugin(), () -> player.openInventory(event.getInventory()), 1);
             } else {
-                invBuilder.executeClose(player, invBuilder);
-                InventoryBuilder.getInventories().remove(player);
+                inventory.executeClose(player);
             }
         }
     }

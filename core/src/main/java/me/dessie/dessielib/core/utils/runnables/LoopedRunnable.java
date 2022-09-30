@@ -10,12 +10,12 @@ import java.util.function.Consumer;
  */
 public class LoopedRunnable extends BukkitRunnable {
 
-    private Consumer<LoopedRunnable> consumer;
-    private int delay;
-    private int timer;
+    private final Consumer<LoopedRunnable> consumer;
+    private final int delay;
+    private final int timer;
+    private final int loops;
 
     private int currentLoop = 0;
-    private int loops;
 
     private Runnable complete;
 

@@ -62,10 +62,10 @@ project.gradle.projectsEvaluated {
         }
 
         //Only used when publishing, not needed to generate when normal builds are being done.
-        java {
-            withJavadocJar()
-            withSourcesJar()
-        }
+//        java {
+//            withJavadocJar()
+//            withSourcesJar()
+//        }
     }
 }
 
