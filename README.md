@@ -26,10 +26,10 @@ maven {
 
 dependencies {
   //Depend on all DessieLib modules.
-  compileOnly 'me.dessie.dessielib:dessielib:1.3.3'
+  compileOnly 'me.dessie.dessielib:dessielib:1.3.4'
     
   //Only depend on InventoryAPI, this can be changed to any DessieLib module listed below.
-  compileOnly 'me.dessie.dessielib:inventory-api:1.4.0'
+  compileOnly 'me.dessie.dessielib:inventory-api:1.4.1'
 }
 ```
 
@@ -40,14 +40,14 @@ dependencies {
   <dependency>
     <groupId>me.dessie.dessielib</groupId>
     <artifactId>dessielib</artifactId>
-    <version>1.3.3</version>
+    <version>1.3.4</version>
   </dependency>
 
   <!-- Only depend on InventoryAPI, this can be changed to any DessieLib module listed below. -->  
   <dependency>
     <groupId>me.dessie.dessielib</groupId>
     <artifactId>inventory-api</artifactId>
-    <version>1.4.0</version>
+    <version>1.4.1</version>
   </dependency>  
 </dependencies>
 ```
@@ -75,18 +75,18 @@ DessieLib provides many features that are cumbersome in CraftBukkit and Spigot, 
 - `StorageAPI` easily stores, retrieves, and deletes data from different types of data structures.
 
 #### Current Versions
-- `Main Project` - 1.3.3
-- `InventoryAPI` - 1.4.0
-- `ScoreboardAPI` - 1.3.3
-- `ParticleAPI` - 1.3.3
-- `EnchantmentAPI` - 1.3.3
-- `ResourcePackAPI` - 1.3.3
-- `Packeteer` - 1.3.3
-- `CommandAPI` - 1.3.3
+- `Main Project` - 1.3.4
+- `InventoryAPI` - 1.4.1
+- `ScoreboardAPI` - 1.3.4
+- `ParticleAPI` - 1.3.4
+- `EnchantmentAPI` - 1.3.4
+- `ResourcePackAPI` - 1.3.4
+- `Packeteer` - 1.3.4
+- `CommandAPI` - 1.3.4
 - `StorageAPI` 
-  - `API` - 1.3.4
-  - `Spigot` - 1.3.3
-  - `Standalone` - 1.3.3
+  - `API` - 1.3.5
+  - `Spigot` - 1.3.4
+  - `Standalone` - 1.3.4
 
 #### Annotations
 Additionally, DessieLib provides some annotations for error/warning catching when using other DessieLib libraries.
@@ -94,7 +94,7 @@ Right now, StorageAPI is the only library that has existing annotations.
 
 If you wish to enable these annotations, make sure to add the following into your build.gradle `dependencies` block.
 ```groovy
-annotationProcessor 'me.dessie.dessielib:annotations:1.3.3'
+annotationProcessor 'me.dessie.dessielib:annotations:1.3.4'
 ```
 
 #### API Examples

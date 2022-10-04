@@ -12,7 +12,7 @@ subprojects {
 
 allprojects {
     group 'me.dessie.dessielib'
-    version '1.3.3'
+    version '1.3.4'
 }
 
 //Define the Minecraft and SpecialSource Versions.
@@ -100,7 +100,7 @@ configure(addSpigotDepend) {
         }
     }
 
-    build.finalizedBy obfuscate
+    jar.finalizedBy obfuscate
 
     dependencies {
         //Spigot dependency
