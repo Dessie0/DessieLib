@@ -83,7 +83,10 @@ DessieLib provides many features that are cumbersome in CraftBukkit and Spigot, 
 - `ResourcePackAPI` - 1.3.3
 - `Packeteer` - 1.3.3
 - `CommandAPI` - 1.3.3
-- `StorageAPI` - 1.3.3
+- `StorageAPI` 
+  - `API` - 1.3.4
+  - `Spigot` - 1.3.3
+  - `Standalone` - 1.3.3
 
 #### Annotations
 Additionally, DessieLib provides some annotations for error/warning catching when using other DessieLib libraries.
