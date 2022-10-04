@@ -1,3 +1,5 @@
+version = '1.3.3'
+
 repositories {
     mavenCentral()
     maven { url 'https://repo.papermc.io/repository/maven-public/' }
@@ -11,7 +13,7 @@ dependencies {
     testImplementation project(":storage-api:test-core")
     testImplementation('org.junit.jupiter:junit-jupiter:5.9.0')
     testImplementation('org.spigotmc:spigot:1.19.2-R0.1-SNAPSHOT:remapped-mojang')
-    testImplementation('com.github.seeseemelk:MockBukkit-v1.19:2.119.3')
+    testImplementation('com.github.seeseemelk:MockBukkit-v1.19:2.120.1')
 }
 
 test {

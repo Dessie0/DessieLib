@@ -234,6 +234,7 @@ public class SlotEventHelper implements Listener {
         if(player.getOpenInventory().getTopInventory().getType() != InventoryType.CRAFTING && player.getOpenInventory().getTopInventory().getType() != InventoryType.PLAYER && player.getOpenInventory().getTopInventory().getType() != InventoryType.MERCHANT) {
             topInventory = Bukkit.createInventory(player, player.getOpenInventory().getTopInventory().getType());
             Inventory openInv = player.getOpenInventory().getTopInventory();
+
             for(int i = 0; i < topInventory.getSize(); i++) {
                 if(isNullOrAir(openInv.getItem(i))) continue;
                 topInventory.setItem(i, openInv.getItem(i).clone());

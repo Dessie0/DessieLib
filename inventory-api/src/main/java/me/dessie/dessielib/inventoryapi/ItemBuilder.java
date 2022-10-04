@@ -1,53 +1,54 @@
 package me.dessie.dessielib.inventoryapi;
 
 import me.dessie.dessielib.core.utils.Colors;
+import me.dessie.dessielib.enchantmentapi.CEnchantment;
+import me.dessie.dessielib.enchantmentapi.CEnchantmentAPI;
+import me.dessie.dessielib.enchantmentapi.properties.CEnchantProperties;
+import me.dessie.dessielib.inventoryapi.inventory.CustomInventory;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
- * Builder for creating Items to put into InventoryBuilders.
+ * Builder for creating Items to put into {@link CustomInventory}s.
  */
 public class ItemBuilder {
 
-    private InventoryBuilder builder;
+    private final Map<CustomInventory<?>, List<Integer>> slots = new HashMap<>();
+
     private ItemStack item;
+    private boolean cancel;
+    private boolean glowing;
+
     private List<ItemStack> cycle = new ArrayList<>();
-    private BiConsumer<Player, ItemBuilder> clickConsumer;
+    private Consumer<ClickResult> clickConsumer;
 
     //Index of the cycle, where 0 is the item the builder was created with.
     private int cycleIndex = 0;
-
-    private boolean cancel;
-    private boolean glowing;
-    int slot;
-    ItemStack heldItem;
-    ClickType clickType;
 
     /**
      * @param item The ItemStack to represent
      */
     public ItemBuilder(ItemStack item) {
         if(!InventoryAPI.isRegistered()) {
-            throw new IllegalStateException("You need to register InventoryAPI before creating InventoryBuilders!");
+            throw new IllegalStateException("You need to register InventoryAPI before creating ItemBuilders!");
         }
 
         this.item = item;
         this.glowing = false;
+
+        this.getCycle().add(this.getItem());
     }
 
     /**
@@ -57,65 +58,60 @@ public class ItemBuilder {
      */
     //Makes a copy
     public ItemBuilder(ItemBuilder itemBuilder) {
-        this.builder = itemBuilder.getBuilder();
         this.item = itemBuilder.getItem().clone();
         this.cancel = itemBuilder.isCancel();
-        this.clickType = itemBuilder.getClick();
-        this.slot = itemBuilder.getSlot();
         this.glowing = itemBuilder.isGlowing();
-        this.heldItem = itemBuilder.getHeldItem();
         this.cycle = itemBuilder.getCycle();
     }
 
     /**
      * @return The {@link ItemStack} this ItemBuilder represents
      */
-    public ItemStack getItem() { return this.item; }
+    public ItemStack getItem() {
+        return this.item;
+    }
 
     /**
-     * @return The {@link InventoryBuilder} this ItemBuilder is currently in
+     * @return The Set of {@link CustomInventory}s this ItemBuilder is currently in.
      */
-    public InventoryBuilder getBuilder() { return this.builder; }
-
-    /**
-     * @return The slot of this ItemBuilder
-     */
-    public int getSlot() { return this.slot; }
+    public Set<CustomInventory<?>> getBuilders() {
+        return this.slots.keySet();
+    }
 
     /**
      * @return If the ItemBuilder can be picked up or not
      */
-    public boolean isCancel() { return this.cancel; }
-
-    /**
-     * @return The last {@link ClickType} that was invoked on this Item
-     */
-    public ClickType getClick() { return this.clickType; }
+    public boolean isCancel() {
+        return this.cancel;
+    }
 
     /**
      * @return If the item is glowing
      */
-    public boolean isGlowing() { return this.glowing; }
-
-    /**
-     * @return The current {@link ItemStack} on the Player's cursor.
-     */
-    public ItemStack getHeldItem() {return this.heldItem; }
+    public boolean isGlowing() {
+        return this.glowing;
+    }
 
     /**
      * @return The {@link ItemStack}s that this ItemBuilder cycles through on clicks
      */
-    public List<ItemStack> getCycle() { return cycle; }
+    public List<ItemStack> getCycle() {
+        return cycle;
+    }
 
     /**
      * @return The current display name of the {@link ItemStack}
      */
-    public String getName() { return this.getItem().getItemMeta().hasDisplayName() ? this.getItem().getItemMeta().getDisplayName() : this.getItem().getType().toString(); }
+    public String getName() {
+        return (this.getItem().getItemMeta() != null && this.getItem().getItemMeta().hasDisplayName()) ? this.getItem().getItemMeta().getDisplayName() : this.getItem().getType().toString();
+    }
 
     /**
      * @return The current Lore of the {@link ItemStack}
      */
-    public List<String> getLore() { return this.getItem().getItemMeta().hasLore() ? this.getItem().getItemMeta().getLore() : new ArrayList<>(); }
+    public List<String> getLore() {
+        return (this.getItem().getItemMeta() != null && this.getItem().getItemMeta().hasLore()) ? this.getItem().getItemMeta().getLore() : new ArrayList<>();
+    }
 
     /**
      * @return The current stacksize of the {@link ItemStack}
@@ -125,17 +121,22 @@ public class ItemBuilder {
     }
 
     /**
+     * @return A map of {@link CustomInventory} this ItemBuilder is currently in, and which slots it is in.
+     */
+    public Map<CustomInventory<?>, List<Integer>> getSlots() {
+        return slots;
+    }
+
+    /**
      * Sets the current Material of the represented ItemStack
      *
      * @param type The new Material
      * @return The ItemBuilder
      */
     public ItemBuilder setMaterial(Material type) {
-        this.item.setType(type);
-        this.getBuilder().update();
+        this.getItem().setType(type);
         return this;
     }
-
 
     /**
      * @param compare The ItemBuilder to compare against
@@ -146,6 +147,8 @@ public class ItemBuilder {
 
         if (this.getItem().isSimilar(compare.getItem()) && this.isGlowing() == compare.isGlowing()) {
             if (this.isCancel() == compare.isCancel()) {
+
+                //TODO Improve cycle comparison to use isSimilar
                 if(this.getCycle() == compare.getCycle()) {
                     return true;
                 }
@@ -158,11 +161,12 @@ public class ItemBuilder {
     /**
      * When clicking this item builder, this method will set their cursor item.
      *
+     * @param player The player to set the cursor for.
      * @param item The Item to set to the cursor on click
      * @return The ItemBuilder
      */
-    public ItemBuilder setCursorOnClick(ItemStack item) {
-        getBuilder().getPlayer().getOpenInventory().setCursor(item);
+    public ItemBuilder setCursorOnClick(Player player, ItemStack item) {
+        player.getOpenInventory().setCursor(item);
         return this;
     }
 
@@ -174,7 +178,13 @@ public class ItemBuilder {
      */
     public ItemBuilder setItem(ItemStack item) {
         this.item = item.clone();
-        updateBuilder();
+
+        for(Map.Entry<CustomInventory<?>, List<Integer>> slots : this.getSlots().entrySet()) {
+            for(Integer slot : slots.getValue()) {
+                slots.getKey().updateInventory(slot, item);
+            }
+        }
+
         return this;
     }
 
@@ -185,8 +195,7 @@ public class ItemBuilder {
      * @return The ItemBuilder
      */
     public ItemBuilder setAmount(int amount) {
-        this.item.setAmount(amount);
-        updateBuilder();
+        this.getItem().setAmount(amount);
         return this;
     }
 
@@ -195,10 +204,13 @@ public class ItemBuilder {
      * @return The ItemBuilder
      */
     public ItemBuilder setName(String name) {
-        ItemMeta meta = this.item.getItemMeta();
+        ItemMeta meta = this.getItem().getItemMeta();
+        if(meta == null) {
+            return this;
+        }
+
         meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
-        this.item.setItemMeta(meta);
-        updateBuilder();
+        this.getItem().setItemMeta(meta);
         return this;
     }
 
@@ -207,16 +219,13 @@ public class ItemBuilder {
      * @return The ItemBuilder
      */
     public ItemBuilder setLore(String... lore) {
-        ItemMeta meta = this.item.getItemMeta();
-
-        List<String> newLore = new ArrayList<>();
-        for(String s : lore) {
-            newLore.add(Colors.color(s));
+        ItemMeta meta = this.getItem().getItemMeta();
+        if(meta == null) {
+            return this;
         }
-        meta.setLore(newLore);
 
-        this.item.setItemMeta(meta);
-        updateBuilder();
+        meta.setLore(Arrays.stream(lore).map(Colors::color).toList());
+        this.getItem().setItemMeta(meta);
         return this;
     }
 
@@ -236,6 +245,10 @@ public class ItemBuilder {
      */
     public ItemBuilder setFlags(ItemFlag... flags) {
         ItemMeta meta = this.getItem().getItemMeta();
+        if(meta == null) {
+            return this;
+        }
+
         meta.addItemFlags(flags);
         this.getItem().setItemMeta(meta);
         return this;
@@ -254,20 +267,13 @@ public class ItemBuilder {
         return this;
     }
 
-    //Internal method
-    //Sets the builder for the item.
-    ItemBuilder setBuilder(InventoryBuilder builder) {
-        this.builder = builder;
-        return this;
-    }
-
     /**
      * Called when the ItemBuilder is clicked.
      * @param consumer A BiFunction containing the Player that clicked the item
      *                 and the ItemBuilder itself.
      * @return The ItemBuilder
      */
-    public ItemBuilder onClick(BiConsumer<Player, ItemBuilder> consumer) {
+    public ItemBuilder onClick(Consumer<ClickResult> consumer) {
         this.clickConsumer = consumer;
         return this;
     }
@@ -293,40 +299,37 @@ public class ItemBuilder {
      * @return The ItemBuilder
      */
     public ItemBuilder cyclesWith(ItemStack... items) {
-        List<ItemStack> cycle = new ArrayList<>();
-        cycle.add(this.getItem());
-        cycle.addAll(Arrays.asList(items));
-        this.cycle = cycle;
+        this.getCycle().addAll(Arrays.asList(items));
         return this;
     }
 
     /**
-     * Toggles the Enchantment Glint on the ItemStack
+     * Toggles the Enchantment Glint on the ItemStack.
+     * This method requires CEnchantmentAPI to be registered.
      *
      * @return The ItemBuilder
      */
     public ItemBuilder toggleGlow() {
+        if(!CEnchantmentAPI.isRegistered()) {
+            throw new IllegalStateException("CEnchantmentAPI is not registered. Cannot toggle glowing.");
+        }
+
         if(!this.isGlowing()) {
-            this.item.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 1);
-            ItemMeta meta = this.item.getItemMeta();
-            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            this.item.setItemMeta(meta);
-            this.glowing = true;
+            if(CEnchantment.getByName("glowing") == null) {
+                new CEnchantment("glowing").setEnchantProperties(new CEnchantProperties());
+            }
+            CEnchantment.getByName("glowing").unsafeEnchant(this.getItem(), 1);
         } else {
-            this.item.removeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL);
-            this.glowing = false;
+            CEnchantment.getByName("glowing").removeEnchantment(this.getItem());
         }
 
-        if(this.getBuilder() != null) {
-            this.getBuilder().update();
-        }
-
+        this.glowing = !this.isGlowing();
         return this;
     }
 
-    void executeClick(Player player, ItemBuilder builder) {
+    void executeClick(ClickResult result) {
         if(clickConsumer == null) return;
-        clickConsumer.accept(player, builder);
+        clickConsumer.accept(result);
     }
 
     /**
@@ -341,6 +344,10 @@ public class ItemBuilder {
     public static ItemStack buildSkull(OfflinePlayer player, int amount, String name, String... lore) {
         ItemStack item = buildItem(Material.PLAYER_HEAD, amount, name, lore);
         SkullMeta meta = (SkullMeta) item.getItemMeta();
+        if(meta == null) {
+            return item;
+        }
+
         meta.setOwningPlayer(player);
         item.setItemMeta(meta);
 
@@ -359,6 +366,10 @@ public class ItemBuilder {
     public static ItemStack buildItem(Material material, int amount, @Nullable String name, @Nullable List<String> lore) {
         ItemStack item = new ItemStack(material, amount);
         ItemMeta meta = item.getItemMeta();
+
+        if(meta == null) {
+            return item;
+        }
 
         if(name != null) {
             meta.setDisplayName(Colors.color(name));
@@ -390,23 +401,11 @@ public class ItemBuilder {
     }
 
     //Internal method.
-    //Updates builder if there is one.
-    private void updateBuilder() {
-        if(this.getBuilder() != null) {
-            this.getBuilder().update();
-        }
-    }
-
-    //Internal method.
     //Used for swapping ItemStacks in the Cycle List
     void swap() {
-        if(this.getCycle().isEmpty()) return;
+        if(this.getCycle().isEmpty() || this.getCycle().size() == 1) return;
 
-        InventoryBuilder builder = this.getBuilder();
-
-        this.cycleIndex = this.cycleIndex + 1 >= this.getCycle().size() ? 0 : cycleIndex + 1;
+        this.cycleIndex = this.cycleIndex + 1 >= this.getCycle().size() ? 0 : this.cycleIndex + 1;
         this.setItem(this.getCycle().get(this.cycleIndex));
-
-        builder.setItem(this, this.getSlot());
     }
 }

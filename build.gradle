@@ -60,12 +60,6 @@ project.gradle.projectsEvaluated {
             //Only used so Spigot Sources do not have annotation errors.
             compileOnly 'org.jetbrains:annotations:16.0.2'
         }
-
-        //Only used when publishing, not needed to generate when normal builds are being done.
-        java {
-            withJavadocJar()
-            withSourcesJar()
-        }
     }
 }
 
@@ -127,6 +121,12 @@ configure(addCoreDepend) {
 
 //Make sure all projects can be published except a testing experimental one.
 configure(publicAll) {
+    //Generate the Sources and JavaDocs jars as well.
+    java {
+        withSourcesJar()
+        withJavadocJar()
+    }
+
     publishing {
         repositories.maven {
             name = "GitHubPackages"

@@ -1,6 +1,7 @@
 package me.dessie.dessielib.storageapi.decomposition;
 
 import me.dessie.dessielib.storageapi.container.StorageContainer;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.function.Function;
  * These components are then saved individually, and then can be retrieved to re-compose the Object.
  *
  * For example, we may want to store a Location value with x, y and z components.
- * We can add a StorageDecomposer, to split the Location into a X, Y, and Z.
+ * We can add a StorageDecomposer, to split the Location into an X, Y, and Z.
  * The StorageDecomposer would then save these components for us automatically whenever a Location
  * is provided into {@link StorageContainer#store(String, Object)}.
  *
@@ -26,25 +27,26 @@ import java.util.function.Function;
 public class StorageDecomposer<T> {
 
     private final Class<T> type;
-    private final Function<T, DecomposedObject> decomposeFunction;
+    private final BiFunction<T, DecomposedObject, DecomposedObject> decomposeFunction;
     private final BiFunction<StorageContainer, RecomposedObject<T>, CompletableFuture<T>> recomposeFunction;
 
     /**
      * @param type The type of class this Decomposer refers to.
-     * @param decomposeFunction A {@link Function} that determines how this type of Object is decomposed.
+     * @param decomposeFunction A {@link BiFunction} that determines how this type of Object is decomposed.
      *                          This should return a {@link DecomposedObject} with the provided paths and objects.
      * @see DecomposedObject
      * @see DecomposedObject#addDecomposedKey(String, Object)
      */
-    public StorageDecomposer(Class<T> type, Function<T, DecomposedObject> decomposeFunction) {
+    public StorageDecomposer(Class<T> type, BiFunction<T, DecomposedObject, DecomposedObject> decomposeFunction) {
         this(type, decomposeFunction, null);
     }
 
     /**
      * @param type The type of class this Decomposer refers to.
-     * @param decomposeFunction A {@link Function} that determines how this type of Object is decomposed.
+     * @param decomposeFunction A {@link BiFunction} that determines how this type of Object is decomposed.
      *                          This Function accepts the Object that a user was going to store, and will always be of type T.
-     *                          This should return a {@link DecomposedObject} with the provided paths and objects.
+     *                          This Function also will accept an empty {@link DecomposedObject} to be filled and returned.
+     *                          This should return the provided DecomposedObject that is filled.
      *
      * @param recomposeFunction A {@link BiFunction} How the StorageDecomposer should retrieve and recompose the Object.
      *                          This accepts the {@link StorageContainer} and the {@link RecomposedObject}, and should return a CompletableFuture for returning the final Object.
@@ -53,7 +55,7 @@ public class StorageDecomposer<T> {
      * @see RecomposedObject#addRecomposeKey(String, Class, Function)
      * @see RecomposedObject#addCompletedRecomposeKey(String, Function)
      */
-    public StorageDecomposer(Class<T> type, Function<T, DecomposedObject> decomposeFunction, BiFunction<StorageContainer, RecomposedObject<T>, CompletableFuture<T>> recomposeFunction) {
+    public StorageDecomposer(Class<T> type, BiFunction<T, DecomposedObject, DecomposedObject> decomposeFunction, BiFunction<StorageContainer, RecomposedObject<T>, CompletableFuture<T>> recomposeFunction) {
         this.type = type;
         this.decomposeFunction = decomposeFunction;
         this.recomposeFunction = recomposeFunction;
@@ -67,8 +69,8 @@ public class StorageDecomposer<T> {
      * @throws ClassCastException if the provided Object is not of type T.
      */
     @SuppressWarnings("unchecked")
-    public DecomposedObject applyDecompose(Object object) throws ClassCastException {
-        return this.getDecomposeFunction().apply((T) object);
+    public DecomposedObject applyDecompose(@Nullable Object object) throws ClassCastException {
+        return this.getDecomposeFunction().apply((T) object, new DecomposedObject());
     }
 
     /**
@@ -135,7 +137,7 @@ public class StorageDecomposer<T> {
     /**
      * @return The decomposition {@link Function} that will be used for decomposing.
      */
-    public Function<T, DecomposedObject> getDecomposeFunction() {return decomposeFunction;}
+    public BiFunction<T, DecomposedObject, DecomposedObject> getDecomposeFunction() {return decomposeFunction;}
 
     /**
      * @return The recomposition {@link BiFunction} that will be used for recomposing.

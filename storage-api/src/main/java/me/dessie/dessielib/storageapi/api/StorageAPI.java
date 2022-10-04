@@ -12,7 +12,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 /**
  * Abstraction class that generically defines and overrides the majority of the required methods for a StorageAPI implementation.
@@ -71,11 +71,10 @@ public abstract class StorageAPI implements IStorageAPI {
 
     @Override
     public <T extends Enum<T>> void addStorageEnum(Class<T> enumType) {
-        this.addStorageDecomposer(new StorageDecomposer<>(enumType, (e) -> {
-            DecomposedObject object = new DecomposedObject();
-            object.addDecomposedKey("value", e.name());
+        this.addStorageDecomposer(new StorageDecomposer<>(enumType, (e, decomposer) -> {
+            decomposer.addDecomposedKey("value", e.name());
 
-            return object;
+            return decomposer;
         }, (container, recompose) -> {
             recompose.addRecomposeKey("value", enumType, container::retrieveAsync);
 
@@ -178,21 +177,20 @@ public abstract class StorageAPI implements IStorageAPI {
         return defaults.getOrDefault(clazz, null);
     }
 
-    private <T> Function<T, DecomposedObject> getGenericDecompose(Class<T> type, List<Field> decomposeFields) {
-        return (obj) -> {
-            DecomposedObject object = new DecomposedObject();
+    private <T> BiFunction<T, DecomposedObject, DecomposedObject> getGenericDecompose(Class<T> type, List<Field> decomposeFields) {
+        return (obj, decomposer) -> {
             for(Field f : decomposeFields) {
                 try {
                     f.setAccessible(true);
                     String path = f.isAnnotationPresent(Stored.class) && !f.getAnnotation(Stored.class).storeAs().equals("") ? f.getAnnotation(Stored.class).storeAs()
                             : f.isAnnotationPresent(StoredList.class) && !f.getAnnotation(StoredList.class).storeAs().equals("") ? f.getAnnotation(StoredList.class).storeAs() : f.getName();
 
-                    object.addDecomposedKey(path, f.get(obj));
+                    decomposer.addDecomposedKey(path, f.get(obj));
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
             }
-            return object;
+            return decomposer;
         };
     }
 

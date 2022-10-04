@@ -50,8 +50,6 @@ import java.util.function.Function;
  *
  * You can override this randomization by using {@link CEnchantProperties#setGrindstoneXpFunction(Function)}
  *
- *
- *
  */
 public class CEnchantProperties {
 
@@ -61,13 +59,13 @@ public class CEnchantProperties {
      * The minimum power level for each enchantment level.
      * For example, {1=5, 2=10, 3=21}
      */
-    private Map<Integer, Integer> minModifiedPower = new HashMap<>();
+    private final Map<Integer, Integer> minModifiedPower = new HashMap<>();
 
     /**
      * The maximum power level for each enchantment level.
      * For example, {1=12, 2=23, 3=43}
      */
-    private Map<Integer, Integer> maxModifiedPower = new HashMap<>();
+    private final Map<Integer, Integer> maxModifiedPower = new HashMap<>();
 
     /**
      * A {@link Rarity} that can be used instead of manually setting the min and max powers.
