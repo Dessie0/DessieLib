@@ -25,8 +25,8 @@ public abstract class CustomInventory<T extends CustomInventory<T>> {
     private boolean preventClose = false;
     private boolean allowPlayerInventory = false;
 
-    protected BiConsumer<Player, CustomInventory<T>> close;
-    protected BiConsumer<Player, CustomInventory<T>> open;
+    private BiConsumer<Player, CustomInventory<T>> close;
+    private BiConsumer<Player, CustomInventory<T>> open;
 
     /**
      * Creates an empty Inventory with a size and title.
@@ -35,14 +35,29 @@ public abstract class CustomInventory<T extends CustomInventory<T>> {
      */
     public CustomInventory(int size, String name) {
         if(!InventoryAPI.isRegistered()) {
-            throw new IllegalStateException("You need to register InventoryAPI before creating InventoryBuilders!");
+            throw new IllegalStateException("You need to register InventoryAPI before creating CustomInventories!");
         }
 
         this.size = size;
         this.name = name;
     }
 
+    /**
+     * Abstraction method for updating an internal {@link Inventory} when changes are made to the CustomInventory.
+     *
+     * @param slot The slot that was changed.
+     * @param newItem The new {@link ItemStack} that is in the slot.
+     */
     public abstract void updateInventory(int slot, ItemStack newItem);
+
+    /**
+     * Abstraction method for updating the {@link CustomInventory} when changes are made to the internal {@link Inventory}.
+     *
+     * @see CustomInventory#setItem(int, ItemBuilder, boolean)
+     *
+     * @param slot The slot that was changed.
+     * @param newItem The new {@link ItemStack} that is in the slot.
+     */
     public abstract void updateBuilder(int slot, ItemStack newItem);
 
     /**
@@ -106,10 +121,10 @@ public abstract class CustomInventory<T extends CustomInventory<T>> {
     }
 
     /**
-     * Opens an InventoryBuilder for the Player.
+     * Opens this CustomInventory for the Player.
      *
      * @param player The player to open this inventory for
-     * @return The InventoryBuilder
+     * @return The caller CustomInventory type instance, for chained builder purposes. 
      */
     @SuppressWarnings("unchecked")
     public T open(Player player) {
@@ -121,7 +136,7 @@ public abstract class CustomInventory<T extends CustomInventory<T>> {
      * Forcefully closes the Inventory.
      *
      * @param player The player to close
-     * @return The InventoryBuilder
+     * @return The caller CustomInventory type instance, for chained builder purposes. 
      */
     @SuppressWarnings("unchecked")
     public T close(Player player) {
@@ -135,8 +150,8 @@ public abstract class CustomInventory<T extends CustomInventory<T>> {
     /**
      * Note: The Inventory title will not update unless it is reopened.
      *
-     * @param name The new name of this InventoryBuilder
-     * @return The InventoryBuilder
+     * @param name The new name of this CustomInventory
+     * @return The caller CustomInventory type instance, for chained builder purposes.
      */
     @SuppressWarnings("unchecked")
     public T setName(String name) {
@@ -147,8 +162,8 @@ public abstract class CustomInventory<T extends CustomInventory<T>> {
     /**
      * Note: The Inventory size will not update unless it is reopened.
      *
-     * @param size The new size of this InventoryBuilder
-     * @return The InventoryBuilder
+     * @param size The new size of this CustomInventory
+     * @return The caller CustomInventory type instance, for chained builder purposes. 
      */
     @SuppressWarnings("unchecked")
     public T setSize(int size) {
@@ -161,11 +176,11 @@ public abstract class CustomInventory<T extends CustomInventory<T>> {
     }
 
     /**
-     * When true, the InventoryBuilder cannot be closed by the player.
+     * When true, the CustomInventory cannot be closed by the player.
      * {@see #close} for manually closing the Inventory.
      *
      * @param preventClose Whether the player can or cannot close the Inventory
-     * @return The InventoryBuilder
+     * @return The caller CustomInventory type instance, for chained builder purposes. 
      */
     @SuppressWarnings("unchecked")
     public T setPreventsClose(boolean preventClose) {
@@ -175,7 +190,7 @@ public abstract class CustomInventory<T extends CustomInventory<T>> {
 
     /**
      * @param allowPlayerInventory Whether the player can interact with their bottom inventory
-     * @return The InventoryBuilder
+     * @return The caller CustomInventory type instance, for chained builder purposes. 
      */
     @SuppressWarnings("unchecked")
     public T setAllowPlayerInventory(boolean allowPlayerInventory) {
@@ -193,7 +208,7 @@ public abstract class CustomInventory<T extends CustomInventory<T>> {
     public ItemBuilder addItem(ItemBuilder item) {
         for(int i = 0; i < this.getSize(); i++) {
             if(this.getItems().get(i) == null) {
-                return this.setItem(i, item);
+                return this.setItem(i, item).getItem(i);
             }
         }
 
@@ -205,7 +220,7 @@ public abstract class CustomInventory<T extends CustomInventory<T>> {
      * Returns null if the inventory is full.
      *
      * @param item The {@link ItemStack} to place into the inventory
-     * @return The generated ItemBuilder that was placed, or null if it could not be placed.
+     * @return The ItemBuilder that was placed, or null if it could not be placed.
      */
     public ItemBuilder addItem(ItemStack item) {
         return this.addItem(new ItemBuilder(item));
@@ -217,9 +232,9 @@ public abstract class CustomInventory<T extends CustomInventory<T>> {
      *
      * @param item The {@link ItemStack} to add.
      * @param slot The slot to set the item in
-     * @return The placed ItemBuilder.
+     * @return The caller CustomInventory type instance, for chained builder purposes.
      */
-    public ItemBuilder setItem(int slot, ItemStack item) {
+    public T setItem(int slot, ItemStack item) {
         return this.setItem(slot, new ItemBuilder(item));
     }
 
@@ -229,13 +244,23 @@ public abstract class CustomInventory<T extends CustomInventory<T>> {
      *
      * @param item The {@link ItemBuilder} to add.
      * @param slot The slot to set the item in
-     * @return The placed ItemBuilder.
+     * @return The caller CustomInventory type instance, for chained builder purposes.
      */
-    public ItemBuilder setItem(int slot, ItemBuilder item) {
+    public T setItem(int slot, ItemBuilder item) {
         return this.setItem(slot, item, true);
     }
 
-    protected ItemBuilder setItem(int slot, ItemBuilder item, boolean updateInventory) {
+    /**
+     * Sets an {@link ItemBuilder} in a specific slot, regardless of if the slot is empty.
+     * Passing null as the item will clear the slot.
+     *
+     * @param item The {@link ItemBuilder} to add.
+     * @param slot The slot to set the item in
+     * @param updateInventory If the {@link CustomInventory#updateInventory(int, ItemStack)} method should be called to reflect this change.
+     * @return The caller CustomInventory type instance, for chained builder purposes.
+     */
+    @SuppressWarnings("unchecked")
+    protected T setItem(int slot, ItemBuilder item, boolean updateInventory) {
         if(item == null || item.getItem().getType() == Material.AIR) {
 
             //Update the ItemBuilder to reflect the fact it's no longer in this builder.
@@ -263,7 +288,7 @@ public abstract class CustomInventory<T extends CustomInventory<T>> {
             if(updateInventory) {
                 this.updateInventory(slot, item.getItem());
             }
-            return item;
+            return (T) this;
         }
     }
 
@@ -272,7 +297,7 @@ public abstract class CustomInventory<T extends CustomInventory<T>> {
      *
      * @param item The {@link ItemBuilder} to add.
      * @param slots The slots to place the ItemBuilder into.
-     * @return The InventoryBuilder.
+     * @return The caller CustomInventory type instance, for chained builder purposes.
      */
     @SuppressWarnings("unchecked")
     public T setItems(ItemBuilder item, Integer... slots) {
@@ -285,7 +310,7 @@ public abstract class CustomInventory<T extends CustomInventory<T>> {
      *
      * @param item The {@link ItemStack} to add.
      * @param slots The slots to place the ItemBuilder into.
-     * @return The InventoryBuilder.
+     * @return The caller CustomInventory type instance, for chained builder purposes.
      */
     @SuppressWarnings("unchecked")
     public T setItems(ItemStack item, Integer... slots) {
@@ -294,18 +319,18 @@ public abstract class CustomInventory<T extends CustomInventory<T>> {
     }
 
     /**
-     * Copies the contents from a {@link Inventory} to this InventoryBuilder.
+     * Copies the contents from a {@link Inventory} to this CustomInventory.
      * @param inventory The Inventory to copy from
-     * @return The InventoryBuilder
+     * @return The caller CustomInventory type instance, for chained builder purposes. 
      */
     public T setContents(Inventory inventory) {
         return (T) this.setContents(inventory.getContents());
     }
 
     /**
-     * Sets the contents of the InventoryBuilder in order from the provided array.
+     * Sets the contents of the CustomInventory in order from the provided array.
      * @param items The items to set.
-     * @return The InventoryBuilder
+     * @return The caller CustomInventory type instance, for chained builder purposes.
      */
     @SuppressWarnings("unchecked")
     public T setContents(ItemStack[] items) {
@@ -318,9 +343,9 @@ public abstract class CustomInventory<T extends CustomInventory<T>> {
     }
 
     /**
-     * Sets the contents of the InventoryBuilder from the list.
+     * Sets the contents of the CustomInventory from the list.
      * @param items The items to set.
-     * @return The InventoryBuilder
+     * @return The caller CustomInventory type instance, for chained builder purposes. 
      */
     @SuppressWarnings("unchecked")
     public T setContents(List<ItemBuilder> items) {
@@ -332,9 +357,9 @@ public abstract class CustomInventory<T extends CustomInventory<T>> {
     }
 
     /**
-     * Copies the contents from a {@link CustomInventory} to this InventoryBuilder.
-     * @param builder The InventoryBuilder to copy from
-     * @return The InventoryBuilder
+     * Copies the contents from a {@link CustomInventory} to this CustomInventory.
+     * @param builder The CustomInventory to copy from
+     * @return The caller CustomInventory type instance, for chained builder purposes. 
      */
     @SuppressWarnings("unchecked")
     public T setContents(CustomInventory<T> builder) {
@@ -343,8 +368,8 @@ public abstract class CustomInventory<T extends CustomInventory<T>> {
     }
 
     /**
-     * Clears all items from this InventoryBuilder
-     * @return The InventoryBuilder
+     * Clears all items from this CustomInventory
+     * @return The caller CustomInventory type instance, for chained builder purposes. 
      */
     @SuppressWarnings("unchecked")
     public T clear() {
@@ -361,7 +386,7 @@ public abstract class CustomInventory<T extends CustomInventory<T>> {
      * Fills all empty slots with the specified {@link ItemBuilder}
      *
      * @param item The item to set
-     * @return The InventoryBuilder
+     * @return The caller CustomInventory type instance, for chained builder purposes. 
      */
     @SuppressWarnings("unchecked")
     //Fills all null slots with the specified ItemBuilder.
@@ -378,7 +403,7 @@ public abstract class CustomInventory<T extends CustomInventory<T>> {
      * Shifts all the items to the top most left position possible.
      *
      * @param byItems If the inventory should be sorted by {@link Material}, alphabetically, and by stack size.
-     * @return The InventoryBuilder
+     * @return The caller CustomInventory type instance, for chained builder purposes.
      */
     @SuppressWarnings("unchecked")
     public T organize(boolean byItems) {
@@ -410,7 +435,7 @@ public abstract class CustomInventory<T extends CustomInventory<T>> {
     /**
      * @see #organize(boolean)
      *
-     * @return The organized InventoryBuilder
+     * @return The organized CustomInventory
      */
     public T organize() {
         return organize(false);
@@ -418,7 +443,7 @@ public abstract class CustomInventory<T extends CustomInventory<T>> {
 
     /**
      * Combines all possible ItemStacks together into their maximum stack size.
-     * @return The InventoryBuilder
+     * @return The caller CustomInventory type instance, for chained builder purposes. 
      */
     @SuppressWarnings("unchecked")
     public T condense() {
@@ -457,7 +482,7 @@ public abstract class CustomInventory<T extends CustomInventory<T>> {
      *
      * @param oldItem The ItemBuilder to replace
      * @param replacement The replacement ItemBuilder
-     * @return The InventoryBuilder
+     * @return The caller CustomInventory type instance, for chained builder purposes. 
      */
     @SuppressWarnings("unchecked")
     public T replaceAll(ItemBuilder oldItem, ItemBuilder replacement) {
@@ -470,9 +495,9 @@ public abstract class CustomInventory<T extends CustomInventory<T>> {
     }
 
     /**
-     * Note: The current InventoryBuilder must be atleast 27 slots.
+     * Note: The current CustomInventory must be atleast 27 slots.
      * @param item The {@link ItemBuilder} to create the border from.
-     * @return The InventoryBuilder
+     * @return The caller CustomInventory type instance, for chained builder purposes. 
      */
     @SuppressWarnings("unchecked")
     public T createBorder(ItemBuilder item) {
@@ -529,8 +554,8 @@ public abstract class CustomInventory<T extends CustomInventory<T>> {
     /**
      * Called when the Inventory is closed.
      * @param consumer A BiFunction containing the Player that closed the Inventory
-     *                 and the InventoryBuilder itself.
-     * @return The InventoryBuilder
+     *                 and the CustomInventory itself.
+     * @return The caller CustomInventory type instance, for chained builder purposes. 
      */
     @SuppressWarnings("unchecked")
     public T onClose(BiConsumer<Player, CustomInventory<T>> consumer) {
@@ -541,8 +566,8 @@ public abstract class CustomInventory<T extends CustomInventory<T>> {
     /**
      * Called when the Inventory is opened.
      * @param consumer A BiFunction containing the Player that opened the Inventory
-     *                 and the InventoryBuilder itself.
-     * @return The InventoryBuilder
+     *                 and the CustomInventory itself.
+     * @return The caller CustomInventory type instance, for chained builder purposes. 
      */
     @SuppressWarnings("unchecked")
     public T onOpen(BiConsumer<Player, CustomInventory<T>> consumer) {
@@ -550,20 +575,40 @@ public abstract class CustomInventory<T extends CustomInventory<T>> {
         return (T) this;
     }
 
+    /**
+     * Adds the player as a holder of the inventory, and executes the {@link CustomInventory#onOpen(BiConsumer)}
+     * consumer if it exists.
+     *
+     * @param player The Player to execute the open for.
+     */
     public void executeOpen(Player player) {
         this.addHolder(player);
-        if(this.open != null) {
-            this.open.accept(player, this);
+        if(this.getOpen() != null) {
+            this.getOpen().accept(player, this);
         }
     }
 
+    /**
+     * Removes the player as a holder of the inventory, and executes the {@link CustomInventory#onClose(BiConsumer)}
+     * consumer if it exists.
+     *
+     * @param player The Player to execute the close for.
+     */
     public void executeClose(Player player) {
         this.removeHolder(player);
-        if(this.close != null) {
-            close.accept(player, this);
+        if(this.getClose() != null) {
+            this.getClose().accept(player, this);
         }
     }
 
+    /**
+     * Adds a player to the holders list for this Inventory.
+     * Players should only be added when they have this inventory opened.
+     *
+     * If you manually add a holder, make sure it is removed by using {@link CustomInventory#removeHolder(Player)}.
+     *
+     * @param player The player to add as a holder.
+     */
     protected void addHolder(Player player) {
         if(!this.getHolders().contains(player.getUniqueId())) {
             this.getHolders().add(player.getUniqueId());
@@ -574,6 +619,14 @@ public abstract class CustomInventory<T extends CustomInventory<T>> {
         }
     }
 
+    /**
+     * Remove a player from the holders list for this Inventory.
+     * If you manually added a holder to this Inventory, you will need to call this method to remove them.
+     *
+     * @see CustomInventory#addHolder(Player)
+     *
+     * @param player That player that should be removed as a holder.
+     */
     protected void removeHolder(Player player) {
         this.getHolders().remove(player.getUniqueId());
         if(this.getHolders().isEmpty()) {
@@ -582,8 +635,22 @@ public abstract class CustomInventory<T extends CustomInventory<T>> {
     }
 
     /**
+     * @return The {@link BiConsumer} that is consumed when the inventory is closed.
+     */
+    protected BiConsumer<Player, CustomInventory<T>> getClose() {
+        return close;
+    }
+
+    /**
+     * @return The {@link BiConsumer} that is consumed when the inventory is opened.
+     */
+    protected BiConsumer<Player, CustomInventory<T>> getOpen() {
+        return open;
+    }
+
+    /**
      * @param player The Player to get
-     * @return The currently open InventoryBuilder of the player
+     * @return The currently open CustomInventory of the player
      */
     public static CustomInventory<?> getBuilder(Player player) {
         return getInventories().stream().filter(inv -> inv.getHolders().contains(player.getUniqueId())).findFirst().orElse(null);

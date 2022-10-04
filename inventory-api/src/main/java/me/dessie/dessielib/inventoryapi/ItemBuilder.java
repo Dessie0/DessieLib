@@ -21,7 +21,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
- * Builder for creating Items to put into InventoryBuilders.
+ * Builder for creating Items to put into {@link CustomInventory}s.
  */
 public class ItemBuilder {
 
@@ -42,11 +42,13 @@ public class ItemBuilder {
      */
     public ItemBuilder(ItemStack item) {
         if(!InventoryAPI.isRegistered()) {
-            throw new IllegalStateException("You need to register InventoryAPI before creating InventoryBuilders!");
+            throw new IllegalStateException("You need to register InventoryAPI before creating ItemBuilders!");
         }
 
         this.item = item;
         this.glowing = false;
+
+        this.getCycle().add(this.getItem());
     }
 
     /**
@@ -159,6 +161,7 @@ public class ItemBuilder {
     /**
      * When clicking this item builder, this method will set their cursor item.
      *
+     * @param player The player to set the cursor for.
      * @param item The Item to set to the cursor on click
      * @return The ItemBuilder
      */
@@ -178,7 +181,7 @@ public class ItemBuilder {
 
         for(Map.Entry<CustomInventory<?>, List<Integer>> slots : this.getSlots().entrySet()) {
             for(Integer slot : slots.getValue()) {
-                slots.getKey().updateBuilder(slot, item);
+                slots.getKey().updateInventory(slot, item);
             }
         }
 
@@ -296,10 +299,7 @@ public class ItemBuilder {
      * @return The ItemBuilder
      */
     public ItemBuilder cyclesWith(ItemStack... items) {
-        List<ItemStack> cycle = new ArrayList<>();
-        cycle.add(this.getItem());
-        cycle.addAll(Arrays.asList(items));
-        this.cycle = cycle;
+        this.getCycle().addAll(Arrays.asList(items));
         return this;
     }
 
@@ -403,9 +403,9 @@ public class ItemBuilder {
     //Internal method.
     //Used for swapping ItemStacks in the Cycle List
     void swap() {
-        if(this.getCycle().isEmpty()) return;
+        if(this.getCycle().isEmpty() || this.getCycle().size() == 1) return;
 
-        this.cycleIndex = this.cycleIndex + 1 >= this.getCycle().size() ? 0 : cycleIndex + 1;
+        this.cycleIndex = this.cycleIndex + 1 >= this.getCycle().size() ? 0 : this.cycleIndex + 1;
         this.setItem(this.getCycle().get(this.cycleIndex));
     }
 }

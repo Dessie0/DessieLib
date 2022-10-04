@@ -9,16 +9,35 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
 
+/**
+ * Creates a {@link CustomInventory} that will be updated for all players that have it opened.
+ */
 public class SingleInventory extends PaginatedInventory<SingleInventory> {
 
     private Inventory inventory;
 
+    /**
+     * Creates a new SingleInventory with the provided size and name.
+     *
+     * The size must be a multiple of 9, no greater than 54 and no less than 9.
+     * The name will automatically have any colors translated, including HEX colors.
+     *
+     * For example: "&amp;bInventory #ffffffName" would result in "Inventory" being aqua, and "Name" being white.
+     *
+     * @param size The size of the inventory.
+     * @param name The name of the inventory.
+     */
     public SingleInventory(int size, String name) {
         super(size, name);
 
         this.inventory = Bukkit.createInventory(null, size, Colors.color(name));
     }
 
+    /**
+     * Returns the {@link Inventory} that this SingleInventory opens for handlers.
+     *
+     * @return The internal Inventory.
+     */
     public Inventory getInventory() {
         return inventory;
     }

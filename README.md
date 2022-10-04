@@ -12,6 +12,8 @@ To depend on DessieLib with a build manager, you'll need to also authenticate to
 
 This involves generating an access token from [GitHub](https://github.com/settings/tokens)
 
+Additionally, each module can be depended on individually, examples of individual modules and the entire project are provided below.
+
 #### Gradle
 ```groovy
 maven {
@@ -23,18 +25,30 @@ maven {
 }
 
 dependencies {
+  //Depend on all DessieLib modules.
   compileOnly 'me.dessie.dessielib:dessielib:1.3.3'
+    
+  //Only depend on InventoryAPI, this can be changed to any DessieLib module listed below.
+  compileOnly 'me.dessie.dessielib:inventory-api:1.4.0'
 }
 ```
 
 #### Maven
 ```xml
 <dependencies>
+  <!-- Depend on all DessieLib modules. -->
   <dependency>
     <groupId>me.dessie.dessielib</groupId>
     <artifactId>dessielib</artifactId>
     <version>1.3.3</version>
   </dependency>
+
+  <!-- Only depend on InventoryAPI, this can be changed to any DessieLib module listed below. -->  
+  <dependency>
+    <groupId>me.dessie.dessielib</groupId>
+    <artifactId>inventory-api</artifactId>
+    <version>1.4.0</version>
+  </dependency>  
 </dependencies>
 ```
 
@@ -47,18 +61,29 @@ to your plugin.yml.
 
 You can download the standalone JAR file from the latest packages release, the latest [release](https://github.com/Dessie0/DessieLib/releases/tag/v1.3.1) or clone the repository and build the JAR yourself.
 
-### :iphone: Features
+### :iphone: Features/Modules
 
 DessieLib provides many features that are cumbersome in CraftBukkit and Spigot, but easily contained within DessieLib.
 
-- `InventoryAPI` is a powerful way to manage inventories without having to mess with events
+- `InventoryAPI` is a powerful way to manage inventories without having to mess with events.
 - `ScoreboardAPI` used to create organized tablists & scoreboards without the hassle of dealing with teams.
 - `ParticleAPI` can easily create complex particle patterns or shapes, and animate them dynamically.
-- `EnchantmentAPI` can manage fully customizable Enchantments
+- `EnchantmentAPI` can manage fully customizable Enchantments.
 - `ResourcePackAPI` Allows you to generate an entire resource pack by just dropping in files.
 - `Packeteer` Allows you to listen for incoming and outgoing packets, and fire events for these packets.
-- `CommandAPI` can automatically register your commands without needing to write them in the plugin.yml
+- `CommandAPI` can automatically register your commands without needing to write them in the plugin.yml.
 - `StorageAPI` easily stores, retrieves, and deletes data from different types of data structures.
+
+#### Current Versions
+- `Main Project` - 1.3.3
+- `InventoryAPI` - 1.4.0
+- `ScoreboardAPI` - 1.3.3
+- `ParticleAPI` - 1.3.3
+- `EnchantmentAPI` - 1.3.3
+- `ResourcePackAPI` - 1.3.3
+- `Packeteer` - 1.3.3
+- `CommandAPI` - 1.3.3
+- `StorageAPI` - 1.3.3
 
 #### Annotations
 Additionally, DessieLib provides some annotations for error/warning catching when using other DessieLib libraries.
@@ -85,44 +110,33 @@ public class Main extends JavaPlugin implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("testinventory")) {
-            //Creates an ItemBuilder as 1 Diamond, named "Diamond" with AQUA color. 
             ItemBuilder item = new ItemBuilder(ItemBuilder.buildItem(Material.DIAMOND, 1, "&bDiamond"));
+
             //Does not allow the item to be picked up
             item.cancel();
-            //When we click, the item will turn into this Emerald. Then back into the Diamond when we click again.
+
+            //When we click, the item will cycle through all it's cyclesWith in order.
             item.cyclesWith(ItemBuilder.buildItem(Material.EMERALD, 1, "&aEmerald"));
+            item.cyclesWith(ItemBuilder.buildItem(Material.COAL, 50, "&0Coal"));
 
             //When we click the item, we'll tell the player which item they clicked.
-            item.onClick(((player, itemBuilder) -> {
-                player.sendMessage("Clicked " + itemBuilder.getName() + "!");
-            }));
+            item.onClick((result) -> {
+                result.getPlayer().sendMessage("Clicked " + result.getItem().getName() + "!");
+            });
 
             //Create the InventoryBuilder as a size of 9 and named "Test Inventory"
-            InventoryBuilder inventoryBuilder = new InventoryBuilder(9, "Test Inventory");
-
-            //Set the diamond item stack in slot 4
-            inventoryBuilder.setItem(item, 4);
-
-            //Tell the player they opened the inventory
-            inventoryBuilder.onOpen((player, builder) -> {
-                player.sendMessage("Opened " + builder.getName());
-            });
-
-            //Tell the player when they close the inventory
-            inventoryBuilder.onClose((player, builder) -> {
-                player.sendMessage("Closed " + builder.getName());
-            });
-
-            //Tell the player when the page changes
-            inventoryBuilder.onPageChange((player, newPage) -> {
-                player.sendMessage("Opening page " + newPage.getName());
-            });
-
-            //Add a new page to the Inventory with a size of 18 and name of "Page 2"
-            inventoryBuilder.addPage(18, "Page 2");
+            SingleInventory inventory = new SingleInventory(9, "Test Inventory")
+                    .setItem(4, item) //Set the diamond item stack in slot 4
+                    .onOpen((opener, inv) -> { //Tell the player they opened the inventory
+                        opener.sendMessage("Opened " + inv.getName());
+                    }).onClose((closer, inv) -> { //Tell the player when they close the inventory
+                        closer.sendMessage("Closed " + inv.getName());
+                    }).onPageChange((changer, newPage) -> { //Tell the player when the page changes
+                        changer.sendMessage("Opening page " + newPage.getName());
+                    }).addPage(new SingleInventory(18, "Page 2")); //Add a new page to the Inventory with a size of 18 and name of "Page 2"
 
             //Open the Inventory
-            inventoryBuilder.open((Player) sender);
+            inventory.open((Player) sender);
             return true;
         }
         return false;
