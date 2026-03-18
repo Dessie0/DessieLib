@@ -1,3 +1,6 @@
+# ⚠️ Project Archived
+**DessieLib has been succeeded by [Isotope](https://github.com/Dessie0/Isotope).** This repository is no longer maintained. Please migrate to the new library for updated features, improved API, and support.
+
 ## DessieLib
 A generic Spigot API for making life easier
 
